@@ -6,6 +6,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.ds.connector.sqs.SQSConnector;
 import org.ds.connector.sqs.SQSConnectorConfig;
+import org.ds.connector.sqs.SQSSink;
 
 public class StreamingJob {
     public static void main(String[] args) throws Exception {
@@ -15,8 +16,12 @@ public class StreamingJob {
         SQSConnectorConfig cfg = new SQSConnectorConfig(System.getenv("QUEUE_URL"), System.getenv("AWS_REGION"));
 
         DataStream<Message> dataStream = env.addSource(new SQSConnector(cfg));
-
-        dataStream.print();
+        dataStream.map(new MessageToCloudEventMapper())
+                .map(new CloudEventToStringMapper())
+                .addSink(new SQSSink(
+                        new SQSConnectorConfig(System.getenv("SINK_QUEUE_URL"), System.getenv("AWS_REGION"))
+                ));
+        //dataStream.print();
 
         env.execute("do it");
     }
