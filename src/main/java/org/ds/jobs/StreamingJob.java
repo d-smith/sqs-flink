@@ -16,12 +16,11 @@ public class StreamingJob {
         SQSConnectorConfig cfg = new SQSConnectorConfig(System.getenv("QUEUE_URL"), System.getenv("AWS_REGION"));
 
         DataStream<Message> dataStream = env.addSource(new SQSConnector(cfg));
-        dataStream.map(new MessageToCloudEventMapper())
-                .map(new CloudEventToStringMapper())
-                .addSink(new SQSSink(
-                        new SQSConnectorConfig(System.getenv("SINK_QUEUE_URL"), System.getenv("AWS_REGION"))
-                ));
-        //dataStream.print();
+        dataStream
+                .map(new MessageToFilterableMapper())
+                .filter(new AttributeValueFilter("a","good"))
+                .map(new MessageToStringMapper())
+                .print();
 
         env.execute("do it");
     }
