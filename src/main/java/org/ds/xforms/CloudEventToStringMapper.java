@@ -1,4 +1,4 @@
-package org.ds.jobs;
+package org.ds.xforms;
 
 import io.cloudevents.CloudEvent;
 import org.apache.flink.api.common.functions.MapFunction;

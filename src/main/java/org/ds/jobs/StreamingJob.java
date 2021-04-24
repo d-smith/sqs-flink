@@ -1,12 +1,13 @@
 package org.ds.jobs;
 
 import com.amazonaws.services.sqs.model.Message;
-import io.cloudevents.CloudEvent;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.ds.connector.sqs.SQSConnector;
 import org.ds.connector.sqs.SQSConnectorConfig;
-import org.ds.connector.sqs.SQSSink;
+import org.ds.xforms.AttributeValueFilter;
+import org.ds.xforms.MessageToFilterableMapper;
+import org.ds.xforms.MessageToStringMapper;
 
 public class StreamingJob {
     public static void main(String[] args) throws Exception {

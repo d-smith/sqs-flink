@@ -1,4 +1,4 @@
-package org.ds.jobs;
+package org.ds.xforms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.api.common.functions.MapFunction;

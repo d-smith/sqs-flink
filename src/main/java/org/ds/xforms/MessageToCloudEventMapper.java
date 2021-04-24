@@ -1,4 +1,4 @@
-package org.ds.jobs;
+package org.ds.xforms;
 
 import com.amazonaws.services.sqs.model.Message;
 import io.cloudevents.CloudEvent;
