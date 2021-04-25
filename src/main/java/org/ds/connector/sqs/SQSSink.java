@@ -2,12 +2,18 @@ package org.ds.connector.sqs;
 
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
+import com.amazonaws.services.sqs.model.DeleteMessageRequest;
+import com.amazonaws.services.sqs.model.DeleteMessageResult;
+import com.amazonaws.services.sqs.model.Message;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SQSSink extends RichSinkFunction<String> {
+public class SQSSink extends RichSinkFunction<SQSSinkInput> {
     private SQSConnectorConfig sqsConnectorConfig;
     private AmazonSQS client;
+    private static final Logger LOG = LoggerFactory.getLogger(SQSSink.class);
 
     public SQSSink(SQSConnectorConfig sqsConnectorConfig) {
         this.sqsConnectorConfig = sqsConnectorConfig;
@@ -25,7 +31,20 @@ public class SQSSink extends RichSinkFunction<String> {
     }
 
     @Override
-    public void invoke(String value, Context context) throws Exception {
-        client.sendMessage(sqsConnectorConfig.getQueueUrl(), value);
+    public void invoke(SQSSinkInput value, Context context) throws Exception {
+        client.sendMessage(sqsConnectorConfig.getQueueUrl(), value.getMessageBody());
+
+        Message upstream = value.getUpstreamMessageContext();
+        if(upstream != null) {
+            //TODO - solidify upstream contract, attribute precondition check, constants, etc.
+            LOG.info("delete upstream sqs message");
+            LOG.info(upstream.getAttributes().toString());
+            DeleteMessageResult deleteMessageResult = client.deleteMessage(
+                    new DeleteMessageRequest(
+                            upstream.getAttributes().get("QURL"),
+                            upstream.getReceiptHandle()
+                    )
+            );
+        }
     }
 }

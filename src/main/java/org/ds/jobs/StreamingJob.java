@@ -5,9 +5,10 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.ds.connector.sqs.SQSConnector;
 import org.ds.connector.sqs.SQSConnectorConfig;
+import org.ds.connector.sqs.SQSSink;
 import org.ds.xforms.AttributeValueFilter;
 import org.ds.xforms.MessageToFilterableMapper;
-import org.ds.xforms.MessageToStringMapper;
+import org.ds.xforms.MessageSQSSinkMapper;
 
 public class StreamingJob {
     public static void main(String[] args) throws Exception {
@@ -20,8 +21,11 @@ public class StreamingJob {
         dataStream
                 .map(new MessageToFilterableMapper())
                 .filter(new AttributeValueFilter("a","good"))
-                .map(new MessageToStringMapper())
-                .print();
+                .map(new MessageSQSSinkMapper())
+                .addSink(new SQSSink(
+                        new SQSConnectorConfig(
+                                System.getenv("SINK_QUEUE_URL"),
+                                System.getenv("AWS_REGION"))));
 
         env.execute("do it");
     }

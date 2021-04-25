@@ -37,15 +37,9 @@ public class SQSConnector extends RichParallelSourceFunction<Message> {
         while(running) {
             List<Message> messages = client.receiveMessage(sqsReceiveRequest).getMessages();
             for(Message m: messages) {
+                LOG.info("Added QURL attribute to message for downstream context");
+                m = m.addAttributesEntry("QURL",sqsConnectorConfig.getQueueUrl());
                 sourceContext.collect(m);
-                LOG.warn("work in progress is removing sqs message from queue - need to pass context downstream for removal post processing... maybe...?");
-                DeleteMessageResult deleteMessageResult = client.deleteMessage(
-                        new DeleteMessageRequest(
-                                sqsConnectorConfig.getQueueUrl(),
-                                m.getReceiptHandle()
-                        )
-                );
-                LOG.info(deleteMessageResult.toString());
             }
         }
     }
