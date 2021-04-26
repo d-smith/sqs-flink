@@ -1,10 +1,7 @@
 package org.ds.connector.sqs;
 
 import com.amazonaws.services.sqs.AmazonSQS;
-import com.amazonaws.services.sqs.AmazonSQSClient;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
-import com.amazonaws.services.sqs.model.DeleteMessageRequest;
-import com.amazonaws.services.sqs.model.DeleteMessageResult;
 import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.services.sqs.model.ReceiveMessageRequest;
 import org.apache.flink.streaming.api.functions.source.RichParallelSourceFunction;
@@ -32,7 +29,8 @@ public class SQSConnector extends RichParallelSourceFunction<Message> {
         ReceiveMessageRequest sqsReceiveRequest = new ReceiveMessageRequest()
                 .withQueueUrl(sqsConnectorConfig.getQueueUrl())
                 .withWaitTimeSeconds(10)
-                .withMaxNumberOfMessages(10);
+                .withMaxNumberOfMessages(10)
+                .withAttributeNames("All");
 
         while(running) {
             List<Message> messages = client.receiveMessage(sqsReceiveRequest).getMessages();

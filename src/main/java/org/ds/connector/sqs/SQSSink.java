@@ -36,9 +36,9 @@ public class SQSSink extends RichSinkFunction<SQSSinkInput> {
 
         Message upstream = value.getUpstreamMessageContext();
         if(upstream != null) {
-            //TODO - solidify upstream contract, attribute precondition check, constants, etc.
             LOG.info("delete upstream sqs message");
             LOG.info(upstream.getAttributes().toString());
+            LOG.info("" + System.currentTimeMillis());
             DeleteMessageResult deleteMessageResult = client.deleteMessage(
                     new DeleteMessageRequest(
                             upstream.getAttributes().get("QURL"),
