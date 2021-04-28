@@ -35,7 +35,7 @@ public class SQSConnector extends RichParallelSourceFunction<Message> {
         while(running) {
             List<Message> messages = client.receiveMessage(sqsReceiveRequest).getMessages();
             for(Message m: messages) {
-                LOG.info("Added QURL attribute to message for downstream context");
+                LOG.info("collected {} from {}", m.toString(), sqsConnectorConfig.getQueueUrl());
                 m = m.addAttributesEntry("QURL",sqsConnectorConfig.getQueueUrl());
                 sourceContext.collect(m);
             }

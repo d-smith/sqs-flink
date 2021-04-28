@@ -32,13 +32,12 @@ public class SQSSink extends RichSinkFunction<SQSSinkInput> {
 
     @Override
     public void invoke(SQSSinkInput value, Context context) throws Exception {
+        LOG.info("write {} to {}", value.getMessageBody().toString(), sqsConnectorConfig.getQueueUrl());
         client.sendMessage(sqsConnectorConfig.getQueueUrl(), value.getMessageBody());
 
         Message upstream = value.getUpstreamMessageContext();
         if(upstream != null) {
             LOG.info("delete upstream sqs message");
-            LOG.info(upstream.getAttributes().toString());
-            LOG.info("" + System.currentTimeMillis());
             DeleteMessageResult deleteMessageResult = client.deleteMessage(
                     new DeleteMessageRequest(
                             upstream.getAttributes().get("QURL"),

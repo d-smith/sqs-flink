@@ -7,6 +7,7 @@ import org.ds.connector.sqs.SQSConnector;
 import org.ds.connector.sqs.SQSConnectorConfig;
 import org.ds.connector.sqs.SQSSink;
 import org.ds.xforms.AttributeValueFilter;
+import org.ds.xforms.EventTypeMapper;
 import org.ds.xforms.MessageToFilterableMapper;
 import org.ds.xforms.MessageSQSSinkMapper;
 
@@ -20,6 +21,7 @@ public class StreamingJob {
         DataStream<Message> dataStream = env.addSource(new SQSConnector(cfg));
         dataStream
                 .map(new MessageToFilterableMapper())
+                .map(new EventTypeMapper())
                 .filter(new AttributeValueFilter("a","good"))
                 .map(new MessageSQSSinkMapper())
                 .addSink(new SQSSink(
